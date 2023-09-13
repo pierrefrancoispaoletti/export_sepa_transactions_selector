@@ -1,7 +1,7 @@
 import { Container, Typography } from "@mui/material";
 import React from "react";
 import colors from "../../colors";
-const { textColorLight, backgroundColorLight } = colors;
+const { titleColor } = colors;
 
 const Header = () => {
   return (
@@ -13,14 +13,12 @@ const Header = () => {
         gutterBottom
         sx={{
           fontWeight: "bold",
-          textTransform: "uppercase",
-          color: textColorLight,
-          backgroundColor: backgroundColorLight,
+          color: titleColor,
           display: "inline-block",
           padding: "0.5em 0.5em 0.5em 0.5em",
         }}
       >
-        Sélection des virements à effectuer
+        Génération de virements au format SEPA
       </Typography>
     </Container>
   );

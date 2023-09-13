@@ -34,11 +34,13 @@ const TransactionsSelector = ({
   isGrouped,
   transactionTotals,
   isTransactionInvalid,
+  isValidDates,
   debitor,
   getTransactionsToExportTotal,
   getTransactionsDatesByCrediteur,
   handleChangeTransactionsToExportDateExecution,
 }) => {
+  console.log(new Date().toISOString().split("T")[0]);
   const totalTransactionsToExport = getTransactionsToExportTotal();
   return (
     <TableContainer sx={{ maxHeight: "calc(100vh - 250px)" }}>
@@ -188,34 +190,38 @@ const TransactionsSelector = ({
                         </strong>
                         {nomCrediteur}
                       </Typography>
-                      {getTransactionsDatesByCrediteur()?.[nomCrediteur]
+                      {((getTransactionsDatesByCrediteur()?.[nomCrediteur]
                         ?.length > 1 &&
-                        isTransactionInvalid(nomCrediteur) &&
-                        isGrouped && (
-                          <Stack justifyContent="center" alignItems="center">
-                            <Alert
-                              severity="warning"
-                              sx={{ marginBottom: "6px" }}
-                              variant="filled"
-                            >
-                              Attention : Les dates d'exécution ne sont pas
-                              équivalentes. Pour générer un export groupé,
-                              veuillez sélectionner une date d'exécution unique
-                              qui sera appliquée pour lors de l'export.
-                            </Alert>
-                            <Box>
-                              <FormControl>
-                                <TextField
-                                  type="date"
-                                  fullWidth={false}
-                                  onChange={handleChangeTransactionsToExportDateExecution(
-                                    nomCrediteur
-                                  )}
-                                />
-                              </FormControl>
-                            </Box>
-                          </Stack>
-                        )}
+                        isGrouped) ||
+                        isTransactionInvalid(nomCrediteur)) && (
+                        <Stack justifyContent="center" alignItems="center">
+                          <Alert
+                            severity="warning"
+                            sx={{ marginBottom: "6px" }}
+                            variant="filled"
+                          >
+                            Attention : Les dates d'exécution ne sont pas
+                            équivalentes ou la date d'execution est postérieure
+                            à la date du jour. Pour générer un export groupé,
+                            veuillez sélectionner une date d'exécution unique
+                            qui sera appliquée lors de l'export.
+                          </Alert>
+                          <Box>
+                            <FormControl>
+                              <TextField
+                                type="date"
+                                fullWidth={false}
+                                onChange={handleChangeTransactionsToExportDateExecution(
+                                  nomCrediteur
+                                )}
+                                inputProps={{
+                                  min: new Date().toISOString().split("T")[0],
+                                }}
+                              />
+                            </FormControl>
+                          </Box>
+                        </Stack>
+                      )}
                     </Stack>
                     <FormControl
                       sx={{ margin: "34px 0" }}
@@ -275,10 +281,11 @@ const TransactionsSelector = ({
                             ).toFixed(
                               2
                             )}) et ne peut pas être inclue dans le fichier d'export`
-                          : isGrouped &&
-                            getTransactionsDatesByCrediteur()?.[nomCrediteur]
-                              ?.length > 1
-                          ? `Les transactions selectionées ont une date d'echeance differente`
+                          : (isGrouped &&
+                              getTransactionsDatesByCrediteur()?.[nomCrediteur]
+                                ?.length > 1) ||
+                            !isValidDates(date_execution)
+                          ? `Les transactions selectionées ont une date d'echeance differente ou antérieure à la date du jour`
                           : `Total transactions : ${
                               isGrouped
                                 ? Number(
@@ -291,7 +298,8 @@ const TransactionsSelector = ({
                       <TableRow
                         key={Res_Id}
                         style={
-                          isTransactionInvalid(nomCrediteur, ttc)
+                          isTransactionInvalid(nomCrediteur, ttc) ||
+                          !isValidDates(date_execution)
                             ? { background: "rgba(241, 102, 83, 0.2)" }
                             : { background: "rgba(27, 94, 32, 0.2)" }
                         }
@@ -301,9 +309,14 @@ const TransactionsSelector = ({
                             style={{ color: backgroundColor }}
                             checked={
                               isTransactionToBeExported(Res_Id) &&
-                              isTransactionInvalid(nomCrediteur, ttc) === false
+                              isTransactionInvalid(nomCrediteur, ttc) ===
+                                false &&
+                              isValidDates(date_execution)
                             }
-                            disabled={isTransactionInvalid(nomCrediteur, ttc)}
+                            disabled={
+                              isTransactionInvalid(nomCrediteur, ttc) ||
+                              !isValidDates(date_execution)
+                            }
                             onClick={selectTransaction(Res_Id)}
                           />
                         </TableCell>
@@ -316,9 +329,38 @@ const TransactionsSelector = ({
                         <TableCell component="th" scope="row" align="center">
                           {ibanCrediteur}
                         </TableCell>
-                        <TableCell component="th" scope="row" align="center">
-                          {date_execution}
-                        </TableCell>
+                        {isValidDates(date_execution) ? (
+                          <TableCell component="th" scope="row" align="center">
+                            {date_execution}
+                          </TableCell>
+                        ) : (
+                          <TableCell component="th" scope="row" align="center">
+                            <FormControl>
+                              <TextField
+                                type="date"
+                                fullWidth={false}
+                                format="dd/MM/yyyy"
+                                sx={{ background: "white" }}
+                                value={
+                                  new Date(
+                                    date_execution
+                                      .split("/")
+                                      .reverse()
+                                      .join("-")
+                                  )
+                                    .toISOString()
+                                    .split("T")[0]
+                                }
+                                onChange={handleChangeTransactionsToExportDateExecution(
+                                  nomCrediteur
+                                )}
+                                inputProps={{
+                                  min: new Date().toISOString().split("T")[0],
+                                }}
+                              />
+                            </FormControl>
+                          </TableCell>
+                        )}
                         <TableCell component="th" scope="row" align="center">
                           {bicCrediteur}
                         </TableCell>

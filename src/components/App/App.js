@@ -15,7 +15,7 @@ import {
 } from "../../dummy-data/test-data";
 import TransactionsSelector from "../TransactionsSelector/TransactionsSelector";
 import { useEffect, useState } from "react";
-import axios, { all } from "axios";
+import axios, { all, isCancel } from "axios";
 import URL_GENERATION from "../../_config";
 import LoadingButton from "@mui/lab/LoadingButton";
 import colors from "../../colors";
@@ -53,10 +53,21 @@ const App = () => {
   const isTransactionInvalid = (nomCrediteur, ttc) => {
     return (
       (isGrouped && transactionTotals[nomCrediteur] < 0) ||
-      (!isGrouped && Number(ttc) < 0) ||
-      (isGrouped &&
-        getTransactionsDatesByCrediteur()?.[nomCrediteur]?.length > 1)
+      (!isGrouped && Number(ttc) <= 0) ||
+      (getTransactionsDatesByCrediteur()?.[nomCrediteur]?.length > 1 &&
+        isGrouped)
     );
+  };
+
+  const isValidDates = (dateExecution) => {
+    if (
+      new Date(dateExecution.split("/").reverse().join("-"))
+        .toISOString()
+        .split("T")[0] >= new Date().toISOString().split("T")[0]
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const isTransactionOK = (transactions) => {
@@ -142,9 +153,14 @@ const App = () => {
   const selectAllTransactions = (e) => {
     const { checked } = e.target;
     if (checked) {
-      const validTransactions = transactions.filter(({ nomCrediteur, ttc }) => {
-        return isTransactionInvalid(nomCrediteur, ttc) === false;
-      });
+      const validTransactions = transactions.filter(
+        ({ nomCrediteur, ttc, date_execution }) => {
+          return (
+            !isTransactionInvalid(nomCrediteur, ttc) &&
+            isValidDates(date_execution)
+          );
+        }
+      );
       setTransactionsToExport(validTransactions);
     } else {
       setTransactionsToExport([]);
@@ -197,8 +213,11 @@ const App = () => {
 
     // ici on refait un balayage sur les transactions valides avant d'envoyer a l'enregistrement
     const transactions = transactionsToExport.filter(
-      ({ nomCrediteur, ttc }) => {
-        return isTransactionInvalid(nomCrediteur, ttc) === false;
+      ({ nomCrediteur, ttc, date_execution }) => {
+        return (
+          isTransactionInvalid(nomCrediteur, ttc) === false &&
+          isValidDates(date_execution)
+        );
       }
     );
     if (transactions.length === 0) {
@@ -447,6 +466,7 @@ const App = () => {
             isGrouped={isGrouped}
             transactionTotals={transactionTotals}
             isTransactionInvalid={isTransactionInvalid}
+            isValidDates={isValidDates}
             debitor={debitor}
             getTransactionsToExportTotal={getTransactionsToExportTotal}
             getTransactionsDatesByCrediteur={getTransactionsDatesByCrediteur}
