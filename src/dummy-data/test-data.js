@@ -18,7 +18,7 @@ export const documents = [
   {
     Res_Id: "6",
     coll_id: "coll_1",
-    ttc: -1000,
+    ttc: 1000,
     id_fournisseur: "2",
     date_execution: "12/09/2023",
     nomCrediteur: "Fournisseur B",

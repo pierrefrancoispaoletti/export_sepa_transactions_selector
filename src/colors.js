@@ -13,7 +13,7 @@ Texte erreur #EA0000
 
 const titleColor = "#196F6E";
 const borderTable = "rgba(80,71,70,0.07)";
-const validateFields = "rgba(25, 111, 110, 0.1)";
+const validateFields = "rgba(27, 94, 32, 0.2)";
 const invalidFields = "#FDE6E6";
 const warningColor = "#FFEBD6";
 const warningTextColor = "#FF8040";

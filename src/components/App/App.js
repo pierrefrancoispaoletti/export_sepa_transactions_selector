@@ -1,11 +1,9 @@
 import {
   Alert,
-  Box,
   Container,
   FormControlLabel,
   Snackbar,
   Stack,
-  Switch,
 } from "@mui/material";
 import Header from "../Header/Header";
 import {
@@ -15,7 +13,7 @@ import {
 } from "../../dummy-data/test-data";
 import TransactionsSelector from "../TransactionsSelector/TransactionsSelector";
 import { useEffect, useState } from "react";
-import axios, { all, isCancel } from "axios";
+import axios from "axios";
 import URL_GENERATION from "../../_config";
 import LoadingButton from "@mui/lab/LoadingButton";
 import colors from "../../colors";
@@ -25,7 +23,15 @@ const ACCOUNT_DEBITORS = window.comptesDebiteurs ?? accountDebitors;
 const DOCUMENTS = window.documents ?? documents;
 const MESSAGES_ERREURS = window.messagesErreurs ?? messagesErreur ?? [];
 
-const { textColorLight, backgroundColor, actionColor } = colors;
+const {
+  textColorLight,
+  backgroundColor,
+  actionColor,
+  invalidFields,
+  textColor,
+  errorTextColor,
+  validateFields,
+} = colors;
 
 const App = () => {
   const [transactions, setTransactions] = useState([...DOCUMENTS]);
@@ -52,7 +58,7 @@ const App = () => {
 
   const isTransactionInvalid = (nomCrediteur, ttc) => {
     return (
-      (isGrouped && transactionTotals[nomCrediteur] < 0) ||
+      (isGrouped && transactionTotals[nomCrediteur] <= 0) ||
       (!isGrouped && Number(ttc) <= 0) ||
       (getTransactionsDatesByCrediteur()?.[nomCrediteur]?.length > 1 &&
         isGrouped)
@@ -237,28 +243,26 @@ const App = () => {
         method: "post",
         url: URL_GENERATION,
         data: formData,
-        responseType: "blob",
       });
 
-      if (response.data.status && response.data.status === "error") {
-        alert(response.data.message);
+      let blob = null;
+
+      if (response.headers["content-type"] === "application/xml") {
+        blob = new Blob([response.data], {
+          type: "application/xml",
+        });
+      } else if (response.headers["content-type"] === "application/zip") {
+        blob = new Blob([response.data], {
+          type: "application/zip",
+        });
       } else {
-        let blob = null;
-
-        if (response.headers["content-type"] === "application/xml") {
-          blob = new Blob([response.data], {
-            type: "application/xml",
-          });
-        } else {
-          blob = new Blob([response.data], {
-            type: "application/zip",
-          });
-        }
-
+        throw new Error(response.data.message);
+      }
+      if (blob) {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
-        const contentDisposition = response.headers["content-disposition"];
-        if (contentDisposition.length > 0) {
+        const contentDisposition = response?.headers["content-disposition"];
+        if (contentDisposition?.length > 0) {
           const filename = contentDisposition?.split("filename=")[1];
           link.href = url;
           link.setAttribute("download", filename);
@@ -268,7 +272,7 @@ const App = () => {
         }
       }
     } catch (error) {
-      alert("Il y à eu une erreur lors de la génération du xml");
+      alert(error.message);
     }
     setLoading(false);
   };
@@ -283,7 +287,7 @@ const App = () => {
     if (favouriteDebitor && !prefs) {
       setMessage({
         status: "success",
-        message: "Compte favori chargé pour tous les fournisseurs",
+        message: "Compte favori chargés pour tous les fournisseurs",
       });
       const map1 = new Map();
       const allCrediteurs = new Set(
@@ -318,7 +322,7 @@ const App = () => {
     if (prefs) {
       setMessage({
         status: "success",
-        message: "Comptes personalisés chargé pour les fournisseurs",
+        message: "Comptes personalisés chargés pour les fournisseurs",
       });
       const infosB = Object.entries(JSON.parse(prefs));
       let newInfos = infosB.map(([nomCrediteur, debitor_id]) => ({
@@ -383,7 +387,15 @@ const App = () => {
           onClose={() => setMessage(null)}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          <Alert severity={message.status} onClose={() => setMessage(null)}>
+          <Alert
+            severity={message.status}
+            onClose={() => setMessage(null)}
+            sx={{
+              background:
+                message.status === "error" ? invalidFields : validateFields,
+              color: message.status === "error" ? errorTextColor : textColor,
+            }}
+          >
             {message.message}
           </Alert>
         </Snackbar>
@@ -397,7 +409,12 @@ const App = () => {
                 setErreurs((erreurs) => erreurs.filter((_, i) => i !== index))
               }
               key={index}
-              sx={{ margin: "6px", fontWeight: "bold" }}
+              sx={{
+                margin: "6px",
+                fontWeight: "bold",
+                background: invalidFields,
+                color: errorTextColor,
+              }}
               severity="error"
             >
               {erreur}
@@ -414,43 +431,50 @@ const App = () => {
           <FormControlLabel
             value="top"
             sx={{
-              color: backgroundColor,
-              textTransform: "uppercase",
+              color: actionColor,
               display: "flex",
               padding: "10px",
               margin: "10px",
             }}
             control={
-              <Switch checked={isGrouped} onChange={() => setGrouped()} />
+              <input
+                type="checkbox"
+                checked={isGrouped}
+                onChange={() => setGrouped()}
+              />
             }
             label="Regrouper les transactions"
+            labelPlacement="start"
+          />
+          <FormControlLabel
+            value="top"
+            sx={{
+              color: actionColor,
+              display: "flex",
+              padding: "10px",
+              margin: "10px",
+            }}
+            control={
+              <input
+                type="checkbox"
+                checked={hideErrors}
+                onChange={() => setHideErrors(!hideErrors)}
+              />
+            }
+            label="Masquer les erreurs"
             labelPlacement="start"
           />
           {erreurs.length > 0 && (
             <Stack>
               {hideErrors && (
-                <Alert variant="filled" severity="warning">
-                  Il y a {erreurs.length} documents en erreur dans l'export
+                <Alert
+                  variant="filled"
+                  severity="warning"
+                  sx={{ background: "#FFEBD6", color: "#FF8040" }}
+                >
+                  Il y à {erreurs.length} documents en erreur dans l'export
                 </Alert>
               )}
-              <FormControlLabel
-                value="top"
-                sx={{
-                  color: backgroundColor,
-                  textTransform: "uppercase",
-                  display: "flex",
-                  padding: "10px",
-                  margin: "10px",
-                }}
-                control={
-                  <Switch
-                    checked={hideErrors}
-                    onChange={() => setHideErrors(!hideErrors)}
-                  />
-                }
-                label="Masquer les erreurs"
-                labelPlacement="start"
-              />
             </Stack>
           )}
         </Container>
@@ -487,8 +511,8 @@ const App = () => {
               sx={{
                 background: actionColor,
                 color: textColorLight,
-                textTransform: "uppercase",
                 fontWeight: "bold",
+                textTransform: "none",
               }}
               variant="contained"
               type="submit"

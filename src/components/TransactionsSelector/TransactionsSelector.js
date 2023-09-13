@@ -1,11 +1,8 @@
 import {
   Alert,
   Box,
-  Checkbox,
+  Divider,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -13,15 +10,21 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { Fragment } from "react";
 import colors from "../../colors";
 
-const { textColor, textColorLight, backgroundColor, backgroundColorLight } =
-  colors;
+const {
+  textColor,
+  textColorLight,
+  backgroundColor,
+  invalidFields,
+  errorTextColor,
+  validateFields,
+  borderTable,
+} = colors;
 
 const TransactionsSelector = ({
   transactions,
@@ -58,9 +61,13 @@ const TransactionsSelector = ({
               align="center"
               component="th"
               scope="row"
-              style={{ background: backgroundColor }}
+              style={{
+                background: backgroundColor,
+                border: `4px solid ${borderTable}`,
+              }}
             >
-              <Checkbox
+              <input
+                type="checkbox"
                 style={{ color: textColorLight }}
                 checked={isAllTransactionsSelected()}
                 onClick={(e) => selectAllTransactions(e)}
@@ -76,7 +83,7 @@ const TransactionsSelector = ({
                 background: backgroundColor,
               }}
             >
-              DOCUMENT
+              Document
             </TableCell>
             <TableCell
               component="th"
@@ -88,7 +95,7 @@ const TransactionsSelector = ({
                 background: backgroundColor,
               }}
             >
-              FOURNISSEUR
+              Fournisseur
             </TableCell>
             <TableCell
               component="th"
@@ -112,7 +119,7 @@ const TransactionsSelector = ({
                 background: backgroundColor,
               }}
             >
-              DATE EXECUTION
+              Date d'exécution
             </TableCell>
             <TableCell
               component="th"
@@ -136,7 +143,7 @@ const TransactionsSelector = ({
                 background: backgroundColor,
               }}
             >
-              MONTANT
+              Montant
             </TableCell>
           </TableRow>
         </TableHead>
@@ -175,22 +182,27 @@ const TransactionsSelector = ({
             return (
               <Fragment key={nomCrediteur}>
                 <TableRow key={nomCrediteur}>
-                  <TableCell colSpan={7} align="left" sx={{ margin: "34px 0" }}>
+                  <TableCell
+                    colSpan={7}
+                    align="left"
+                    sx={{
+                      margin: "34px 0",
+                      border: `4px solid ${borderTable}`,
+                    }}
+                  >
                     <Stack direction="row" spacing={2} alignItems="center">
                       <Typography
                         component="span"
                         sx={{
                           display: "inline-block",
-                          background: backgroundColorLight,
                           padding: "10px",
+                          border: `2px solid ${borderTable}`,
                         }}
                       >
-                        <strong style={{ color: textColorLight }}>
-                          Pour le fournisseur :{" "}
-                        </strong>
+                        <strong>Pour le fournisseur : </strong>
                         {nomCrediteur}
                       </Typography>
-                      {((getTransactionsDatesByCrediteur()?.[nomCrediteur]
+                      {/* {((getTransactionsDatesByCrediteur()?.[nomCrediteur]
                         ?.length > 1 &&
                         isGrouped) ||
                         isTransactionInvalid(nomCrediteur)) && (
@@ -221,7 +233,7 @@ const TransactionsSelector = ({
                             </FormControl>
                           </Box>
                         </Stack>
-                      )}
+                      )} */}
                     </Stack>
                     <FormControl
                       sx={{ margin: "34px 0" }}
@@ -234,10 +246,13 @@ const TransactionsSelector = ({
                             ?.length > 1)
                       }
                     >
-                      <InputLabel style={{ color: textColor }}>
-                        Debiteur
-                      </InputLabel>
-                      <Select
+                      <label style={{ color: textColor }}>Débiteur</label>
+                      <select
+                        style={{
+                          fontSize: "1.2rem",
+                          color: "#3A96DA",
+                          fontWeight: "bold",
+                        }}
                         value={
                           debitor.find((d) => d.nomCrediteur === nomCrediteur)
                             ?.debitor_id || ""
@@ -246,17 +261,15 @@ const TransactionsSelector = ({
                           transactions,
                           nomCrediteur
                         )}
-                        label="Debiteur"
-                        variant="outlined"
                       >
                         {DEBITORS_ACCOUNT.map(
                           ({ id, nom_debiteur, iban, bic, format }) => (
-                            <MenuItem key={id} value={id}>
+                            <option key={id} value={id}>
                               {`${nom_debiteur} - ${iban} - ${bic} - ${format}`}
-                            </MenuItem>
+                            </option>
                           )
                         )}
-                      </Select>
+                      </select>
                     </FormControl>
                   </TableCell>
                 </TableRow>
@@ -300,12 +313,16 @@ const TransactionsSelector = ({
                         style={
                           isTransactionInvalid(nomCrediteur, ttc) ||
                           !isValidDates(date_execution)
-                            ? { background: "rgba(241, 102, 83, 0.2)" }
-                            : { background: "rgba(27, 94, 32, 0.2)" }
+                            ? {
+                                background: invalidFields,
+                                color: errorTextColor,
+                              }
+                            : { background: validateFields }
                         }
                       >
                         <TableCell component="th" scope="row" align="center">
-                          <Checkbox
+                          <input
+                            type="checkbox"
                             style={{ color: backgroundColor }}
                             checked={
                               isTransactionToBeExported(Res_Id) &&
@@ -336,11 +353,11 @@ const TransactionsSelector = ({
                         ) : (
                           <TableCell component="th" scope="row" align="center">
                             <FormControl>
-                              <TextField
+                              <input
                                 type="date"
-                                fullWidth={false}
                                 format="dd/MM/yyyy"
-                                sx={{ background: "white" }}
+                                style={{ background: "white" }}
+                                min={new Date().toISOString().split("T")[0]}
                                 value={
                                   new Date(
                                     date_execution
@@ -354,9 +371,6 @@ const TransactionsSelector = ({
                                 onChange={handleChangeTransactionsToExportDateExecution(
                                   nomCrediteur
                                 )}
-                                inputProps={{
-                                  min: new Date().toISOString().split("T")[0],
-                                }}
                               />
                             </FormControl>
                           </TableCell>
@@ -373,16 +387,28 @@ const TransactionsSelector = ({
                 )}
                 {totalTransactionsToExport[nomCrediteur] > 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} align="right">
-                      <Typography
-                        sx={{ fontWeight: "bold", color: backgroundColor }}
-                      >
+                    <TableCell sx={{ border: "none" }} />
+                    <TableCell sx={{ border: "none" }} />
+                    <TableCell sx={{ border: "none" }} />
+                    <TableCell sx={{ border: "none" }} />
+                    <TableCell sx={{ border: "none" }} />
+                    <TableCell sx={{ border: "none" }} />
+                    <TableCell
+                      colSpan={1}
+                      align="right"
+                      sx={{
+                        border: `2px solid ${borderTable}`,
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: "bold" }}>
                         TOTAL {nomCrediteur} :{" "}
                         {totalTransactionsToExport[nomCrediteur].toFixed(2)}
+                        <sup>€</sup>
                       </Typography>
                     </TableCell>
                   </TableRow>
                 )}
+                <div style={{ marginBottom: "8px" }} />
               </Fragment>
             );
           })}
