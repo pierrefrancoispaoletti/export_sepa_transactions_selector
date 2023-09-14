@@ -379,7 +379,9 @@ const TransactionsSelector = ({
                           {bicCrediteur}
                         </TableCell>
                         <TableCell component="th" scope="row" align="center">
-                          {ttc.toFixed(2)}
+                          {new Intl.NumberFormat("fr-FR", {
+                            minimumFractionDigits: 2,
+                          }).format(Number(ttc.toFixed(2)))}
                         </TableCell>
                       </TableRow>
                     </Tooltip>
