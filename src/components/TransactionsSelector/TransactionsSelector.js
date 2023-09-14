@@ -402,8 +402,14 @@ const TransactionsSelector = ({
                     >
                       <Typography sx={{ fontWeight: "bold" }}>
                         TOTAL {nomCrediteur} :{" "}
-                        {totalTransactionsToExport[nomCrediteur].toFixed(2)}
-                        <sup>€</sup>
+                        {new Intl.NumberFormat("fr-FR", {
+                          style: "currency",
+                          currency: "EUR",
+                        }).format(
+                          Number(
+                            totalTransactionsToExport[nomCrediteur].toFixed(2)
+                          )
+                        )}
                       </Typography>
                     </TableCell>
                   </TableRow>
