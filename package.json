@@ -1,6 +1,6 @@
 {
   "name": "transactions-selector",
-  "homepage": "_DevClient/EXPORT_SEPA/transactions-selector/back/react",
+  "homepage": "./_DevClient/EXPORT_SEPA/transactions-selector/back/react",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
