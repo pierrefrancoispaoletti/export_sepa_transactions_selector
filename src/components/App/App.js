@@ -23,6 +23,8 @@ const ACCOUNT_DEBITORS = window.comptesDebiteurs ?? accountDebitors;
 const DOCUMENTS = window.documents ?? documents;
 const MESSAGES_ERREURS = window.messagesErreurs ?? messagesErreur ?? [];
 
+export const SURCHARGE = window.surcharge ?? 0;
+
 const {
   textColorLight,
   backgroundColor,
@@ -237,8 +239,6 @@ const App = () => {
     const formData = new FormData();
     formData.append("transactions", JSON.stringify(transactions));
     formData.append("isGrouped", isGrouped);
-
-    console.log(process.env.PUBLIC_URL);
 
     try {
       const response = await axios({
