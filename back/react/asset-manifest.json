@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "./_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/css/main.b1c1a42d.css",
-    "main.js": "./_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.b5a376ac.js",
-    "index.html": "./_DevClient/EXPORT_SEPA/transactions-selector/back/react/index.html",
-    "main.b1c1a42d.css.map": "./_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/css/main.b1c1a42d.css.map",
-    "main.b5a376ac.js.map": "./_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.b5a376ac.js.map"
+    "main.css": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/css/main.b1c1a42d.css",
+    "main.js": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.adf306c5.js",
+    "index.html": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/index.html",
+    "main.b1c1a42d.css.map": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/css/main.b1c1a42d.css.map",
+    "main.adf306c5.js.map": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.adf306c5.js.map"
   },
   "entrypoints": [
     "static/css/main.b1c1a42d.css",
-    "static/js/main.b5a376ac.js"
+    "static/js/main.adf306c5.js"
   ]
 }
