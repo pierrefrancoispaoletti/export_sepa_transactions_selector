@@ -238,6 +238,8 @@ const App = () => {
     formData.append("transactions", JSON.stringify(transactions));
     formData.append("isGrouped", isGrouped);
 
+    console.log(process.env.PUBLIC_URL);
+
     try {
       const response = await axios({
         method: "post",
