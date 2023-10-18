@@ -39,7 +39,7 @@ const App = () => {
   const [transactions, setTransactions] = useState([...DOCUMENTS]);
   const [transactionsToExport, setTransactionsToExport] = useState([]);
   const [isGrouped, setIsGrouped] = useState(
-    localStorage.getItem("isGrouped") === "true"
+    localStorage.getItem("isGrouped") === "true" ? true : false
   );
   const [loading, setLoading] = useState(false);
   const [transactionTotals, setTransactionTotals] = useState({});
@@ -245,6 +245,7 @@ const App = () => {
         method: "post",
         url: URL_GENERATION,
         data: formData,
+        responseType: "blob",
       });
 
       let blob = null;

@@ -67,6 +67,7 @@ const TransactionsSelector = ({
               }}
             >
               <input
+                id="check-select-all"
                 type="checkbox"
                 style={{ color: textColorLight }}
                 checked={isAllTransactionsSelected()}
