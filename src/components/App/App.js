@@ -33,6 +33,8 @@ const {
   textColor,
   errorTextColor,
   validateFields,
+  warningColor,
+  warningTextColor,
 } = colors;
 
 const App = () => {
@@ -68,6 +70,7 @@ const App = () => {
   };
 
   const isValidDates = (dateExecution) => {
+    console.log(dateExecution);
     if (
       new Date(dateExecution.split("/").reverse().join("-"))
         .toISOString()
@@ -113,22 +116,41 @@ const App = () => {
   };
 
   const handleChangeTransactionsToExportDateExecution =
-    (nomCrediteur) => (e) => {
+    (nomCrediteur, description = "") =>
+    (e) => {
       const { value } = e.target;
       let newDate = new Date(value).toLocaleDateString("fr-FR");
       setTransactionsToExport((transactionsToExport) => {
-        return transactionsToExport.map((transaction) =>
-          transaction.nomCrediteur === nomCrediteur
-            ? { ...transaction, date_execution: newDate }
-            : transaction
-        );
+        if (description === "") {
+          return transactionsToExport.map((transaction) =>
+            transaction.nomCrediteur === nomCrediteur
+              ? { ...transaction, date_execution: newDate }
+              : transaction
+          );
+        } else {
+          return transactionsToExport.map((transaction) =>
+            transaction.nomCrediteur === nomCrediteur &&
+            transaction.description === description
+              ? { ...transaction, date_execution: newDate }
+              : transaction
+          );
+        }
       });
       setTransactions((transactions) => {
-        return transactions.map((transaction) =>
-          transaction.nomCrediteur === nomCrediteur
-            ? { ...transaction, date_execution: newDate }
-            : transaction
-        );
+        if (description === "") {
+          return transactions.map((transaction) =>
+            transaction.nomCrediteur === nomCrediteur
+              ? { ...transaction, date_execution: newDate }
+              : transaction
+          );
+        } else {
+          return transactions.map((transaction) =>
+            transaction.nomCrediteur === nomCrediteur &&
+            transaction.description === description
+              ? { ...transaction, date_execution: newDate }
+              : transaction
+          );
+        }
       });
     };
 
@@ -473,7 +495,7 @@ const App = () => {
                 <Alert
                   variant="filled"
                   severity="warning"
-                  sx={{ background: "#FFEBD6", color: "#FF8040" }}
+                  sx={{ background: warningColor, color: warningTextColor }}
                 >
                   Il y à {erreurs.length} documents en erreur dans l'export
                 </Alert>

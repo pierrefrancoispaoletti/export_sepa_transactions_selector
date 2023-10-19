@@ -10,6 +10,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -24,6 +25,8 @@ const {
   errorTextColor,
   validateFields,
   borderTable,
+  warningColor,
+  warningTextColor,
 } = colors;
 
 const TransactionsSelector = ({
@@ -161,6 +164,7 @@ const TransactionsSelector = ({
                   ttc,
                   debitor_id,
                   date_execution,
+                  description,
                 }
               ) => {
                 if (!acc[nomCrediteur]) {
@@ -174,12 +178,13 @@ const TransactionsSelector = ({
                   ttc,
                   debitor_id,
                   date_execution,
+                  description,
                 });
                 return acc;
               },
               {}
             )
-          ).map(([nomCrediteur, transactions, ttc, Res_Id]) => {
+          ).map(([nomCrediteur, transactions, ttc, Res_Id, description]) => {
             return (
               <Fragment key={nomCrediteur}>
                 <TableRow key={nomCrediteur}>
@@ -203,38 +208,43 @@ const TransactionsSelector = ({
                         <strong>Pour le fournisseur : </strong>
                         {nomCrediteur}
                       </Typography>
-                      {/* {((getTransactionsDatesByCrediteur()?.[nomCrediteur]
-                        ?.length > 1 &&
-                        isGrouped) ||
-                        isTransactionInvalid(nomCrediteur)) && (
-                        <Stack justifyContent="center" alignItems="center">
-                          <Alert
-                            severity="warning"
-                            sx={{ marginBottom: "6px" }}
-                            variant="filled"
-                          >
-                            Attention : Les dates d'exécution ne sont pas
-                            équivalentes ou la date d'execution est postérieure
-                            à la date du jour. Pour générer un export groupé,
-                            veuillez sélectionner une date d'exécution unique
-                            qui sera appliquée lors de l'export.
-                          </Alert>
-                          <Box>
-                            <FormControl>
-                              <TextField
-                                type="date"
-                                fullWidth={false}
-                                onChange={handleChangeTransactionsToExportDateExecution(
-                                  nomCrediteur
-                                )}
-                                inputProps={{
-                                  min: new Date().toISOString().split("T")[0],
-                                }}
-                              />
-                            </FormControl>
-                          </Box>
-                        </Stack>
-                      )} */}
+                      {isGrouped &&
+                        (getTransactionsDatesByCrediteur()?.[nomCrediteur]
+                          ?.length > 1 ||
+                          isTransactionInvalid(nomCrediteur)) && (
+                          <Stack justifyContent="center" alignItems="center">
+                            <Alert
+                              severity="warning"
+                              sx={{
+                                marginBottom: "6px",
+                                background: warningColor,
+                                color: warningTextColor,
+                              }}
+                              variant="filled"
+                            >
+                              Attention : Les dates d'exécution ne sont pas
+                              équivalentes ou la date d'execution est
+                              postérieure à la date du jour. Pour générer un
+                              export groupé, veuillez sélectionner une date
+                              d'exécution unique qui sera appliquée lors de
+                              l'export.
+                            </Alert>
+                            <Box>
+                              <FormControl>
+                                <TextField
+                                  type="date"
+                                  fullWidth={false}
+                                  onChange={handleChangeTransactionsToExportDateExecution(
+                                    nomCrediteur
+                                  )}
+                                  inputProps={{
+                                    min: new Date().toISOString().split("T")[0],
+                                  }}
+                                />
+                              </FormControl>
+                            </Box>
+                          </Stack>
+                        )}
                     </Stack>
                     <FormControl
                       sx={{ margin: "34px 0" }}
@@ -282,6 +292,7 @@ const TransactionsSelector = ({
                     bicCrediteur,
                     ttc,
                     date_execution,
+                    description,
                   }) => (
                     <Tooltip
                       key={Res_Id}
@@ -370,7 +381,8 @@ const TransactionsSelector = ({
                                     .split("T")[0]
                                 }
                                 onChange={handleChangeTransactionsToExportDateExecution(
-                                  nomCrediteur
+                                  nomCrediteur,
+                                  description
                                 )}
                               />
                             </FormControl>
