@@ -320,7 +320,12 @@ const App = () => {
       );
       for (const key of allCrediteurs) {
         map1.set(key, favouriteDebitor.id);
+        localStorage.setItem(
+          "debitors",
+          JSON.stringify(Object.fromEntries(map1))
+        );
       }
+
       let infosA = Array.from(map1.entries());
 
       let newInfosA = infosA.map(([nomCrediteur, debitor_id]) => ({

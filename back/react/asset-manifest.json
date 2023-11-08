@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/css/main.b1c1a42d.css",
-    "main.js": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.030022a5.js",
+    "main.js": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.b0cb23d3.js",
     "index.html": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/index.html",
     "main.b1c1a42d.css.map": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/css/main.b1c1a42d.css.map",
-    "main.030022a5.js.map": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.030022a5.js.map"
+    "main.b0cb23d3.js.map": "/_DevClient/EXPORT_SEPA/transactions-selector/back/react/static/js/main.b0cb23d3.js.map"
   },
   "entrypoints": [
     "static/css/main.b1c1a42d.css",
-    "static/js/main.030022a5.js"
+    "static/js/main.b0cb23d3.js"
   ]
 }
