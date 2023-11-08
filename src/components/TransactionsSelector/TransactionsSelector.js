@@ -273,6 +273,9 @@ const TransactionsSelector = ({
                           nomCrediteur
                         )}
                       >
+                        <option key="" value="">
+                          Veuillez choisir un debiteur
+                        </option>
                         {DEBITORS_ACCOUNT.map(
                           ({ id, nom_debiteur, iban, bic, format }) => (
                             <option key={id} value={id}>
